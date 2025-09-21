@@ -25,3 +25,87 @@ A prototype web application to support the **Digital AYUSH ecosystem** by mappin
 
 ## 📂 Project Structure
 
+namaste_fullstack_prototype2/
+├── backend/ # Node.js backend (placeholder)
+│ ├── server.js
+│ └── package.json
+├── frontend/ # Next.js frontend app
+│ ├── pages/
+│ │ ├── index.js # Main UI
+│ │ └── _app.js # Loads Tailwind
+│ ├── data/
+│ │ └── diseases.js # AYUSH disease dataset
+│ ├── styles/
+│ │ └── globals.css # Tailwind + custom CSS
+│ ├── tailwind.config.js
+│ ├── postcss.config.js
+│ └── package.json
+└── README.md
+
+
+---
+
+## 🚀 Running Locally
+
+1. Clone the repo:
+   ```bash
+   git clone https://github.com/dheebashsai/namaste-demo.git
+   cd namaste-demo/frontend
+
+2.Install dependencies:
+npm install
+
+3.Run development server:
+npm run dev
+
+4.Open:
+http://localhost:3000
+
+🖼 Screenshots
+🔑 Login
+
+Box with demo login button.
+
+🔍 Search
+
+Filter diseases by typing terms.
+
+🌐 Translate
+
+See JSON output mapping AYUSH → ICD-11.
+
+📂 Upload
+
+Upload FHIR Bundle (demo mode).
+
+🛠 Tech Stack
+
+Next.js
+ – React framework
+
+TailwindCSS
+ – UI styling
+
+FHIR
+ – Healthcare data standard
+
+ICD-11
+ – Biomedical terminology
+
+ 🙌 Contributors
+
+Ayusync (Project Developer Team)
+
+Open for contributions from the community.
+
+📜 License
+
+MIT License – feel free to use and adapt.
+
+
+---
+
+✅ Paste this into your `README.md`, commit, and push.  
+Your GitHub repo will instantly look **professional** with a nice project description, features, usage guide, and impact statement.  
+
+👉 Do you also want me to add a **diagram PNG** (Doctor → NAMASTE → Mapping → FHIR → ABDM) and link it inside this README so your repo looks even more complete?
