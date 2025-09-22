@@ -1,146 +1,286 @@
+// pages/index.js
 import { useState } from "react";
-import { Search, Upload, Copy } from "lucide-react";
-import diseases from "../data/diseases"; // or "../data/diseases"
+import { Search, Upload, Copy, LogIn, ArrowLeft } from "lucide-react";
+import diseases from "../data/diseases";
+
+/*
+  Replacement index.js that uses inline styles to *guarantee* center alignment.
+  No Tailwind or framer-motion required for centering.
+*/
 
 export default function Home() {
+  const [step, setStep] = useState(0); // 0=Login,1=Search,2=Translate,3=Upload
   const [q, setQ] = useState("");
   const [translateOut, setTranslateOut] = useState(null);
   const [token, setToken] = useState("");
   const [bundleOut, setBundleOut] = useState(null);
 
-  // 🔑 Demo login (no backend needed)
-  async function login() {
+  const filteredResults = q
+    ? diseases.filter((d) => d.name.toLowerCase().includes(q.toLowerCase()))
+    : [];
+
+  // Inline styles (guarantee centering)
+  const pageStyle = {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: 24,
+    background: "linear-gradient(180deg, #ECFDF5 0%, #F0F9FF 50%, #F5F3FF 100%)",
+    boxSizing: "border-box",
+  };
+
+  const cardStyle = {
+    width: "100%",
+    maxWidth: 960,   // was 720, now bigger
+    background: "#ffffff",
+    borderRadius: 20,
+    boxShadow: "0 24px 48px rgba(16,24,40,0.1)",
+    border: "1px solid rgba(15,23,42,0.06)",
+    padding: 40,     // was 28, now more spacious
+    boxSizing: "border-box",
+  };
+
+
+  const inputStyle = {
+    width: "100%",
+    padding: "10px 12px",
+    borderRadius: 8,
+    border: "1px solid #CBD5E1",
+    outline: "none",
+    boxSizing: "border-box",
+  };
+
+  function handleGetToken() {
     setToken("demo-token-12345");
-    alert("Got demo token (demo mode)");
+    setStep(1); // go to search
   }
 
-  // 📂 Demo upload (no backend needed)
-  async function uploadBundle() {
+  function handleUpload() {
     if (!token) {
       alert("Please login first");
       return;
     }
     setBundleOut({ status: "success", message: "Bundle uploaded (demo)" });
+
+    // ⏳ After 1.5s, go back to the login step
+    setTimeout(() => {
+      setBundleOut(null);
+      setStep(0);
+    }, 1500);
   }
 
-  // 🔍 Filter diseases
-  const filteredResults = q
-    ? diseases.filter((d) =>
-      d.name.toLowerCase().includes(q.toLowerCase())
-    )
-    : [];
 
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-3xl mx-auto space-y-6">
-        {/* Title */}
-        <h1 className="text-3xl font-bold text-center text-green-700 flex items-center justify-center gap-2">
-          🌿 NAMASTE Demo
-        </h1>
+    <div style={pageStyle}>
+      <div style={cardStyle}>
+        {/* Header */}
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
+          {step === 0 && <LogIn size={22} color="#059669" />}
+          {step === 1 && <Search size={22} color="#2563EB" />}
+          {step === 2 && <span style={{ fontSize: 22 }}>🌐</span>}
+          {step === 3 && <Upload size={22} color="#7C3AED" />}
 
-        {/* 🔑 Login Section */}
-        <div className="bg-white p-4 rounded-2xl shadow space-y-2">
-          <h2 className="text-lg font-semibold flex items-center gap-2">
-            <span>🔑</span> Login
+          <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#0F172A" }}>
+            {step === 0 && "Login"}
+            {step === 1 && "Search Diseases"}
+            {step === 2 && "Translate"}
+            {step === 3 && "Upload Bundle"}
           </h2>
-          <button
-            onClick={login}
-            className="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
-          >
-            Get Demo Token
-          </button>
-          <p className="text-sm text-gray-600">
-            Token:{" "}
-            <span className="font-mono">
-              {token ? token.slice(0, 20) + "..." : "Not logged in"}
-            </span>
-          </p>
         </div>
 
-        {/* 🔍 Search Section */}
-        <div className="bg-white p-4 rounded-2xl shadow">
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <span>🔎</span> Search Diseases
-          </h2>
-          <div className="flex gap-2 mb-4">
+        {/* Content by step */}
+        {step === 0 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <p style={{ margin: 0, color: "#475569" }}>Click below to get a demo token.</p>
+            <button
+              onClick={handleGetToken}
+              style={{
+                padding: "10px 14px",
+                background: "#10B981",
+                color: "white",
+                border: "none",
+                borderRadius: 8,
+                cursor: "pointer",
+                width: 180,
+              }}
+            >
+              Get Demo Token
+            </button>
+            <div style={{ marginTop: 8, color: "#6B7280", fontFamily: "monospace" }}>
+              Token: {token || "Not logged in"}
+            </div>
+          </div>
+        )}
+
+        {step === 1 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
             <input
-              type="text"
-              placeholder="Type e.g. Jwara"
               value={q}
               onChange={(e) => setQ(e.target.value)}
-              className="flex-1 border rounded-lg px-3 py-2"
+              placeholder="Search e.g. Jwara"
+              style={inputStyle}
             />
-            <button className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
-              <Search size={16} /> Search
-            </button>
-          </div>
-          <ul className="space-y-2">
-            {filteredResults.map((d) => (
-              <li key={d.code} className="p-3 bg-gray-50 rounded-lg shadow">
-                <div className="flex justify-between">
-                  <span>
-                    <strong>{d.code}</strong> – {d.name}
-                  </span>
-                </div>
-                <p className="text-sm text-gray-600">{d.description}</p>
-                <p className="text-xs text-gray-500">
-                  TM2: {d.tm2} | Biomed: {d.biomed}
-                </p>
-                <button
-                  onClick={() => setTranslateOut(d)}
-                  className="mt-2 px-3 py-1 bg-indigo-600 text-white text-sm rounded-lg hover:bg-indigo-700"
+
+            <div style={{ maxHeight: 280, overflowY: "auto", marginTop: 6 }}>
+              {q && filteredResults.length === 0 && (
+                <div style={{ color: "#64748B" }}>No results</div>
+              )}
+              {filteredResults.map((d) => (
+                <div
+                  key={d.code}
+                  style={{
+                    padding: 12,
+                    background: "#F8FAFC",
+                    borderRadius: 8,
+                    border: "1px solid rgba(2,6,23,0.04)",
+                    marginBottom: 10,
+                    display: "flex",
+                    justifyContent: "space-between",
+                  }}
                 >
-                  Translate
-                </button>
-              </li>
-            ))}
-          </ul>
-        </div>
+                  <div>
+                    <div style={{ fontWeight: 700, color: "#059669" }}>
+                      {d.code} – {d.name}
+                    </div>
+                    <div style={{ fontSize: 12, color: "#64748B" }}>
+                      TM2: {d.tm2} | Biomed: {d.biomed}
+                    </div>
+                    <div style={{ marginTop: 6, fontSize: 13, color: "#334155" }}>
+                      {d.description}
+                    </div>
+                  </div>
+                  <div style={{ marginLeft: 12, alignSelf: "center" }}>
+                    <button
+                      onClick={() => {
+                        setTranslateOut(d);
+                        setStep(2); // go to translate
+                      }}
+                      style={{
+                        padding: "8px 10px",
+                        background: "#4F46E5",
+                        color: "white",
+                        border: "none",
+                        borderRadius: 8,
+                        cursor: "pointer",
+                        fontSize: 13,
+                      }}
+                    >
+                      Translate
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
 
-        {/* 🌐 Translate Section */}
-        <div className="bg-white p-4 rounded-2xl shadow">
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <span>🌐</span> Translate
-          </h2>
-          <div className="bg-gray-900 text-green-400 font-mono p-4 rounded-lg relative">
-            <pre className="whitespace-pre-wrap text-sm">
-              {translateOut
-                ? JSON.stringify(translateOut, null, 2)
-                : "Select a disease to translate"}
-            </pre>
-            <button
-              onClick={() =>
-                translateOut &&
-                navigator.clipboard.writeText(
-                  JSON.stringify(translateOut, null, 2)
-                )
-              }
-              className="absolute top-2 right-2 text-gray-300 hover:text-white"
-            >
-              <Copy size={18} />
-            </button>
+            <div style={{ display: "flex", gap: 8, marginTop: 6 }}>
+              <button
+                onClick={() => setStep(0)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 10px",
+                  background: "#F1F5F9",
+                  border: "1px solid #E6E9EE",
+                  color: "#0F172A",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                }}
+              >
+                <ArrowLeft size={14} /> Back
+              </button>
+            </div>
           </div>
-        </div>
+        )}
 
-        {/* 📂 Upload Section */}
-        <div className="bg-white p-4 rounded-2xl shadow">
-          <h2 className="text-lg font-semibold mb-3 flex items-center gap-2">
-            <span>📂</span> Upload Bundle
-          </h2>
-          <button
-            onClick={uploadBundle}
-            className="px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 flex items-center gap-2"
-          >
-            <Upload size={16} /> Upload (requires token)
-          </button>
-          <div className="mt-3 bg-gray-100 p-3 rounded-lg text-sm font-mono">
-            <pre>
-              {bundleOut
-                ? JSON.stringify(bundleOut, null, 2)
-                : "No bundle uploaded"}
-            </pre>
+        {step === 2 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <div style={{ background: "#0F172A", color: "#10B981", fontFamily: "monospace", padding: 12, borderRadius: 8 }}>
+              <pre style={{ margin: 0, whiteSpace: "pre-wrap" }}>
+                {translateOut ? JSON.stringify(translateOut, null, 2) : "No disease selected"}
+              </pre>
+            </div>
+
+            <div style={{ display: "flex", justifyContent: "space-between", gap: 8 }}>
+              <button
+                onClick={() => setStep(1)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 10px",
+                  background: "#F1F5F9",
+                  border: "1px solid #E6E9EE",
+                  color: "#0F172A",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                }}
+              >
+                <ArrowLeft size={14} /> Back
+              </button>
+
+              <button
+                onClick={() => setStep(3)}
+                style={{
+                  padding: "10px 14px",
+                  background: "#7C3AED",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                }}
+              >
+                Next: Upload Bundle
+              </button>
+            </div>
           </div>
-        </div>
+        )}
+
+        {step === 3 && (
+          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            <p style={{ margin: 0, color: "#475569" }}>Upload a FHIR bundle (demo mode).</p>
+
+            <div style={{ display: "flex", gap: 8 }}>
+              <button
+                onClick={handleUpload}
+                style={{
+                  padding: "10px 14px",
+                  background: "#7C3AED",
+                  color: "white",
+                  border: "none",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                }}
+              >
+                Upload (demo)
+              </button>
+
+              <button
+                onClick={() => setStep(2)}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "8px 10px",
+                  background: "#F1F5F9",
+                  border: "1px solid #E6E9EE",
+                  color: "#0F172A",
+                  borderRadius: 8,
+                  cursor: "pointer",
+                }}
+              >
+                <ArrowLeft size={14} /> Back
+              </button>
+            </div>
+
+            {bundleOut && (
+              <div style={{ background: "#F8FAFC", padding: 10, borderRadius: 8, fontFamily: "monospace", fontSize: 12 }}>
+                <pre style={{ margin: 0 }}>{JSON.stringify(bundleOut, null, 2)}</pre>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );
