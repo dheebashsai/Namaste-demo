@@ -1,7 +1,14 @@
-import '../styles/global.css'
+import "../styles/global.css";
+import Head from "next/head";
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
+export default function App({ Component, pageProps }) {
+  return (
+    <>
+      <Head>
+        <title>AYUSYNC</title>
+        <link rel="icon" href="/favicon.ico" />
+      </Head>
+      <Component {...pageProps} />
+    </>
+  );
 }
-
-export default MyApp
